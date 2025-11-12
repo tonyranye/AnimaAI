@@ -48,13 +48,13 @@ Path:        images/
 ```
 
 You need permission to access the bucket.  
-The owner (Lukas) can provide this in one of two ways:
+You can get this in one of two ways:
 
 ---
 
 ### 🅰️ Option A — Direct Access via Google Account (Recommended)
 
-1. Lukas grants you access in the **Google Cloud Console**:  
+1. Someone grants you access in the **Google Cloud Console**:  
    - Go to **Storage → Buckets → animal-ai-images → Permissions**  
    - Click **“Grant Access”**  
    - Enter your **Google email address**  
@@ -73,7 +73,7 @@ gcloud auth application-default login
 
 ### 🅱️ Option B — Service Account JSON Key
 
-If direct access isn’t possible, Lukas can send you a JSON key file that grants access.
+If direct access isn’t possible, someone can send you a JSON key file that grants access.
 
 1. Save the file (for example):
 
@@ -159,7 +159,7 @@ plt.show()
 | Problem | Likely Cause | Solution |
 |----------|---------------|-----------|
 | `OSError: Project was not passed...` | No project ID found | Add `project="poised-gateway-478017"` in `storage.Client()` or set the environment variable. |
-| `403 Forbidden` | You don’t have permission to the bucket | Ask Lukas to add your email as a **Storage Object Viewer**. |
+| `403 Forbidden` | You don’t have permission to the bucket | Ask someone to add your email as a **Storage Object Viewer**. |
 | `google.auth.exceptions.DefaultCredentialsError` | No valid login or JSON key | Run `gcloud auth application-default login` or set `GOOGLE_APPLICATION_CREDENTIALS`. |
 | No images downloaded | Wrong bucket name or prefix | Verify `BUCKET_NAME` and `PREFIX` values. |
 
@@ -192,7 +192,7 @@ If you only have read access, uploading will be blocked — this is normal for m
 | Step | Action |
 |------|--------|
 | 1 | Install Python and dependencies |
-| 2 | Get bucket access or a JSON key from Lukas |
+| 2 | Get bucket access or a JSON key |
 | 3 | Authenticate (`gcloud` or environment variable) |
 | 4 | Set project ID |
 | 5 | Run `python test_gcs.py` |
@@ -206,13 +206,11 @@ Deleting or modifying anything in **Google Cloud Storage** only affects the buck
 
 ---
 
-## 👤 Author & Project Info
+## 👤 Project Info
 
-**Author:** Lukas Fenkam  
 **Project ID:** `poised-gateway-478017`  
 **Bucket:** `animal-ai-images`  
 **Dataset Path:** `images/`  
-**Duration:** Fall 2025 — Machine Learning Project  
 
 ---
 
