@@ -13,7 +13,7 @@ The Python code connects directly to that bucket to retrieve images for machine 
 You will:
 - Authenticate with Google Cloud  
 - Download or view images from the shared bucket  
-- Run the provided Python script (`test_gcs.py`)  
+- Run `test.py`
 - Modify the project on your own computer  
 
 ---
@@ -117,10 +117,10 @@ client = storage.Client(project="poised-gateway-478017")
 After access and dependencies are ready, test the setup:
 
 ```bash
-python test_gcs.py
+python test.py
 ```
 
-### Example `test_gcs.py`
+### Example `test.py`
 ```python
 from google.cloud import storage
 from pathlib import Path
