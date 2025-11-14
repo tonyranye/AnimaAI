@@ -117,42 +117,10 @@ client = storage.Client(project="poised-gateway-478017")
 After access and dependencies are ready, test the setup:
 
 ```bash
-python test.py
+python testdisplay.py
 ```
 
-### Example `test.py`
-```python
-from google.cloud import storage
-from pathlib import Path
-from PIL import Image
-import matplotlib.pyplot as plt
-
-PROJECT_ID = "poised-gateway-478017"
-BUCKET_NAME = "animal-ai-images"
-PREFIX = "images/"
-LOCAL_DIR = Path("test_images")
-LOCAL_DIR.mkdir(exist_ok=True)
-
-client = storage.Client(project=PROJECT_ID)
-
-# Download the first few images
-for i, blob in enumerate(client.list_blobs(BUCKET_NAME, prefix=PREFIX)):
-    if i >= 5:
-        break
-    dest = LOCAL_DIR / Path(blob.name).name
-    blob.download_to_filename(dest)
-    print("Downloaded:", dest)
-
-# Display the last downloaded image
-img = Image.open(dest)
-plt.imshow(img)
-plt.axis("off")
-plt.show()
-```
-
-✅ If everything is configured correctly, the console will show “Downloaded:” lines, and an image will open in a matplotlib window.
-
----
+If it worked, you should get an image of a cat!
 
 ## 6️⃣ Troubleshooting
 
