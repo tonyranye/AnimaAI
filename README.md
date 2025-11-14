@@ -28,7 +28,7 @@ Before starting, make sure you have:
 - The following Python packages installed:
 
 ```bash
-pip install google-cloud-storage pillow matplotlib
+pip install torch torchvision google-cloud-storage pillow
 ```
 
 Optional but recommended:
