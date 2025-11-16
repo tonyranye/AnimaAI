@@ -21,7 +21,7 @@ Install them using the command below:
 pip install torch torchvision pillow matplotlib
 ```
 
-## 5️⃣ Running the Code
+## 3️⃣ Running the Code
 
 After installing the dependencies, you're ready to start training the model.
 Run the following command in your terminal:
