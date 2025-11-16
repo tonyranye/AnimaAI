@@ -3,6 +3,7 @@
 
 This project trains a neural network to classify animal images stored locally on your computer.
 Once the required Python packages are installed, you can run the training script immediately
+
 ---
 
 ## 2️⃣ Prerequisites
