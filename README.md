@@ -15,6 +15,11 @@ Before running the project, make sure the following Python packages are installe
 - Pillow
 - matplotlib
 
+
+GUI packages
+- streamlit
+- gradio
+
 Install them using the command below:
 
 ```
