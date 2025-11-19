@@ -8,11 +8,21 @@ from tqdm import tqdm
 
 from animal_dataset import AnimalDataset
 
+'''
+
+    TRAING CODE FOR DOG BREED CLASSIFICATION FOR THE FOLLOWING:
+    
+    
+
+
+
+'''
 
 
 DATA_ROOT = "Animals"  
 BATCH_SIZE = 32
-NUM_EPOCHS = 15
+NUM_EPOCHS = 5
+
 LR = 1e-4
 VAL_SPLIT = 0.2
 
@@ -118,6 +128,12 @@ def train():
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=LR)
     
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer,
+        mode="min",       # we want to minimize val_loss
+        factor=0.5,       # reduce LR by 2x
+        patience=1,       # epochs to wait with no improvement
+    )
     best_val_loss = float("inf")
     best_state = None
     
@@ -186,10 +202,14 @@ def train():
                 "label_to_idx": label_to_idx,
                 "class_names": class_names,
             }
+        
+        scheduler.step(val_loss)
+
 
     # -----save best model AFTER training -----
-    torch.save(best_state, "animal_model_local.pth")
+    torch.save(best_state, "dog-breed_model_local.pth")
     print("Saved best model with val_loss:", best_val_loss, "accuracy:", val_acc)
+    
     
 
 
