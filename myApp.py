@@ -7,7 +7,7 @@ import gradio as gr
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 # --- Load checkpoint saved by your training script ---
-checkpoint = torch.load("animal_model_local.pth", map_location=DEVICE)
+checkpoint = torch.load("butterfly_model_local.pth", map_location=DEVICE)
 class_names = checkpoint["class_names"]           # e.g. ["cat", "dog", "spider"]
 label_to_idx = checkpoint["label_to_idx"]         # e.g. {"cat": 0, "dog": 1, "spider": 2}
 
