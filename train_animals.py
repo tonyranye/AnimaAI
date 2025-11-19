@@ -11,7 +11,7 @@ from animal_dataset import AnimalDataset
 
 DATA_ROOT = "Animals"  
 BATCH_SIZE = 32
-NUM_EPOCHS = 5
+NUM_EPOCHS = 10
 LR = 1e-4
 VAL_SPLIT = 0.2
 
@@ -24,21 +24,25 @@ def list_image_paths_and_labels(root_dir):
     image_paths = []
     labels = []
 
-    for label in sorted(os.listdir(root_dir)):
-        class_dir = os.path.join(root_dir, label)
-        if not os.path.isdir(class_dir):
+    for dirpath, dirnames, filenames in os.walk(root_dir):
+        # skip the root itself (we only want subfolders as classes)
+        if dirpath == root_dir:
             continue
+        
+        label = os.path.basename(dirpath)
 
-        for fname in os.listdir(class_dir):
+        for fname in filenames:
             if not fname.lower().endswith(exts):
                 continue
-            full_path = os.path.join(class_dir, fname)
+
+            full_path = os.path.join(dirpath, fname)
             image_paths.append(full_path)
             labels.append(label)
 
     print(f"Found {len(image_paths)} images across {len(set(labels))} classes.")
     print("Classes:", sorted(set(labels)))
     return image_paths, labels
+
 
 
 # 2) Create train/val datasets and loaders
