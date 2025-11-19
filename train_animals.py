@@ -4,6 +4,7 @@ import random
 import torch
 from torch.utils.data import DataLoader
 from torchvision import models, transforms
+from tqdm import tqdm
 
 from animal_dataset import AnimalDataset
 
@@ -11,7 +12,7 @@ from animal_dataset import AnimalDataset
 
 DATA_ROOT = "Animals"  
 BATCH_SIZE = 32
-NUM_EPOCHS = 5
+NUM_EPOCHS = 15
 LR = 1e-4
 VAL_SPLIT = 0.2
 
@@ -65,14 +66,22 @@ def create_dataloaders():
 
     # Transforms
     train_transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        transforms.Normalize(
-            mean=[0.485, 0.456, 0.406],
-            std=[0.229, 0.224, 0.225],
-        ),
-    ])
+    transforms.RandomResizedCrop(224, scale=(0.7, 1.0), ratio=(0.75, 1.33)),  
+    transforms.RandomHorizontalFlip(p=0.5),
+    transforms.RandomRotation(15),  
+    transforms.ColorJitter(
+        brightness=0.2,
+        contrast=0.2,
+        saturation=0.2,
+        hue=0.05
+    ),
+    transforms.ToTensor(),
+    transforms.Normalize(
+        mean=[0.485, 0.456, 0.406],
+        std=[0.229, 0.224, 0.225],
+    ),
+])
+
 
     val_transform = transforms.Compose([
         transforms.Resize((224, 224)),
@@ -108,15 +117,22 @@ def train():
 
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=LR)
-
+    
+    best_val_loss = float("inf")
+    best_state = None
+    
+    
     for epoch in range(NUM_EPOCHS):
+        print(f"\nEpoch {epoch+1}/{NUM_EPOCHS}")
+         
+         
         # ----- Train -----
         model.train()
         running_loss = 0.0
         correct = 0
         total = 0
 
-        for images, targets in train_loader:
+        for images, targets in tqdm(train_loader, desc="Training", leave=False):
             images = images.to(DEVICE)
             targets = targets.to(DEVICE)
 
@@ -162,16 +178,19 @@ def train():
             f"Val loss: {val_loss:.4f}, acc: {val_acc:.3f}"
         )
 
-    # Save model + label mapping
-    torch.save(
-        {
-            "model_state_dict": model.state_dict(),
-            "label_to_idx": label_to_idx,
-            "class_names": class_names,
-        },
-        "animal_model_local.pth",
-    )
-    print("Saved model to animal_model_local.pth")
+        # ----- track best model -----
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            best_state = {
+                "model_state_dict": model.state_dict(),
+                "label_to_idx": label_to_idx,
+                "class_names": class_names,
+            }
+
+    # -----save best model AFTER training -----
+    torch.save(best_state, "animal_model_local.pth")
+    print("Saved best model with val_loss:", best_val_loss, "accuracy:", val_acc)
+    
 
 
 if __name__ == "__main__":
