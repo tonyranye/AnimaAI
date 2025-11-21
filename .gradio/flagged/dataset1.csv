@@ -1,0 +1,3 @@
+Upload an animal image,Predicted class,timestamp
+.gradio\flagged\Upload an animal image\c32c58e76aaf50b8ebbc\1000002613.jpg,"{""label"": ""cats"", ""confidences"": [{""label"": ""cats"", ""confidence"": 0.8901259303092957}, {""label"": ""dogs"", ""confidence"": 0.08601333200931549}, {""label"": ""elephant"", ""confidence"": 0.02189175970852375}]}",2025-11-21 10:00:43.098871
+.gradio\flagged\Upload an animal image\0cdca8b64e125346387e\1000002613.jpg,"{""label"": ""cats"", ""confidences"": [{""label"": ""cats"", ""confidence"": 0.8901259303092957}, {""label"": ""dogs"", ""confidence"": 0.08601333200931549}, {""label"": ""elephant"", ""confidence"": 0.02189175970852375}]}",2025-11-21 10:00:45.905396
