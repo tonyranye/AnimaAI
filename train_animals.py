@@ -1,15 +1,12 @@
-import os
-import random
-
 import torch
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split
 from torchvision import models, transforms
 
-from animal_dataset import AnimalDataset
+from gcs_dataset import GCSImageDataset
 
 
+MANIFEST_PATH = "manifest.csv"
 
-DATA_ROOT = "Animals"  
 BATCH_SIZE = 32
 NUM_EPOCHS = 5
 LR = 1e-4
@@ -18,52 +15,13 @@ VAL_SPLIT = 0.2
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 
-# 1) Scan local folders and build image_paths + labels
-def list_image_paths_and_labels(root_dir):
-    exts = (".jpg", ".jpeg", ".png")
-    image_paths = []
-    labels = []
-
-    for label in sorted(os.listdir(root_dir)):
-        class_dir = os.path.join(root_dir, label)
-        if not os.path.isdir(class_dir):
-            continue
-
-        for fname in os.listdir(class_dir):
-            if not fname.lower().endswith(exts):
-                continue
-            full_path = os.path.join(class_dir, fname)
-            image_paths.append(full_path)
-            labels.append(label)
-
-    print(f"Found {len(image_paths)} images across {len(set(labels))} classes.")
-    print("Classes:", sorted(set(labels)))
-    return image_paths, labels
-
-
-# 2) Create train/val datasets and loaders
 def create_dataloaders():
-    image_paths, labels = list_image_paths_and_labels(DATA_ROOT)
+    """
+    Create train/validation DataLoaders using the GCSImageDataset,
+    which streams images directly from a private GCS bucket.
+    """
 
-    # Map class name -> integer index
-    class_names = sorted(set(labels))
-    label_to_idx = {name: i for i, name in enumerate(class_names)}
-    print("label_to_idx:", label_to_idx)
-
-    # Shuffle and split indices
-    indices = list(range(len(image_paths)))
-    random.shuffle(indices)
-    split = int(len(indices) * (1.0 - VAL_SPLIT))
-    train_idx = indices[:split]
-    val_idx = indices[split:]
-
-    def select(idxs):
-        return [image_paths[i] for i in idxs], [labels[i] for i in idxs]
-
-    train_paths, train_labels = select(train_idx)
-    val_paths, val_labels = select(val_idx)
-
-    # Transforms
+    # Augmentation + normalization for training
     train_transform = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.RandomHorizontalFlip(),
@@ -74,6 +32,7 @@ def create_dataloaders():
         ),
     ])
 
+    # Only resize + normalize for validation
     val_transform = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
@@ -83,25 +42,59 @@ def create_dataloaders():
         ),
     ])
 
-    train_dataset = AnimalDataset(train_paths, train_labels, label_to_idx, transform=train_transform)
-    val_dataset = AnimalDataset(val_paths, val_labels, label_to_idx, transform=val_transform)
+    # Build two copies of the dataset with different transforms
+    full_dataset_for_train = GCSImageDataset(MANIFEST_PATH, transform=train_transform)
+    full_dataset_for_val = GCSImageDataset(MANIFEST_PATH, transform=val_transform)
 
-    train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=2)
-    val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=2)
+    label_to_idx = full_dataset_for_train.label_to_idx
+    class_names = sorted(label_to_idx.keys())
+
+    dataset_size = len(full_dataset_for_train)
+    val_size = int(dataset_size * VAL_SPLIT)
+    train_size = dataset_size - val_size
+
+    # Ensure at least one sample in each split (for tiny datasets)
+    if train_size == 0:
+        train_size = 1
+        val_size = dataset_size - 1
+    if val_size == 0 and dataset_size > 1:
+        val_size = 1
+        train_size = dataset_size - 1
+
+    generator = torch.Generator().manual_seed(42)
+    train_subset, val_subset = random_split(
+        full_dataset_for_train,
+        [train_size, val_size],
+        generator=generator,
+    )
+
+    # Validation subset uses validation transforms
+    val_subset.dataset = full_dataset_for_val
+
+    # IMPORTANT on Windows: num_workers=0 to avoid pickling GCS client issues
+    train_loader = DataLoader(
+        train_subset,
+        batch_size=BATCH_SIZE,
+        shuffle=True,
+        num_workers=0,
+    )
+    val_loader = DataLoader(
+        val_subset,
+        batch_size=BATCH_SIZE,
+        shuffle=False,
+        num_workers=0,
+    )
 
     return train_loader, val_loader, label_to_idx, class_names
 
 
-# 3) Build model
 def create_model(num_classes):
-    # Start from ImageNet pre-trained ResNet18 
     model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
     num_features = model.fc.in_features
     model.fc = torch.nn.Linear(num_features, num_classes)
     return model.to(DEVICE)
 
 
-# 4) Training loop
 def train():
     train_loader, val_loader, label_to_idx, class_names = create_dataloaders()
     model = create_model(num_classes=len(class_names))
@@ -162,7 +155,6 @@ def train():
             f"Val loss: {val_loss:.4f}, acc: {val_acc:.3f}"
         )
 
-    # Save model + label mapping
     torch.save(
         {
             "model_state_dict": model.state_dict(),
