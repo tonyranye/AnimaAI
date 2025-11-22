@@ -5,6 +5,7 @@ import torch
 from torch.utils.data import DataLoader
 from torchvision import models, transforms
 
+from tqdm import tqdm
 from animal_dataset import AnimalDataset
 
 
@@ -116,7 +117,7 @@ def train():
         correct = 0
         total = 0
 
-        for images, targets in train_loader:
+        for images, targets in tqdm(train_loader, desc="Traiing", leave=False):
             images = images.to(DEVICE)
             targets = targets.to(DEVICE)
 

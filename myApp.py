@@ -53,5 +53,9 @@ demo = gr.Interface(
     description="Upload a cat/dog/spider image and see what the model predicts.",
 )
 
+print(torch.cuda.is_available())
+print(DEVICE)
+
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(share = True)
+    
