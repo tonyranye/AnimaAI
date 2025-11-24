@@ -11,7 +11,7 @@ from animal_dataset import AnimalDataset
 
 DATA_ROOT = "Animals"  
 BATCH_SIZE = 32
-NUM_EPOCHS = 10
+NUM_EPOCHS = 6
 LR = 1e-4
 VAL_SPLIT = 0.2
 

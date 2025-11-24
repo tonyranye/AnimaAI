@@ -21,13 +21,6 @@ model.eval()
 
 # --- Pretty display names for classes (you can expand this anytime) ---
 PRETTY_LABELS = {
-    # generic classes
-    "cats": "Cat",
-    "dogs": "Dog",
-    "elephant": "Elephant",
-    "butterfly": "Butterfly",
-    "Lions":"Loin",
-    "Cheetahs":"Cheetah",
 
     # cat breeds
     "Abyssinian": "Abyssinian cat",
