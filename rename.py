@@ -1,7 +1,7 @@
 from pathlib import Path
 
 # Base "images" directory (relative to where you run this script)
-BASE_DIR = Path("images")
+BASE_DIR = Path("Animals")
 
 if not BASE_DIR.is_dir():
     print(f"Directory '{BASE_DIR}' not found!")
