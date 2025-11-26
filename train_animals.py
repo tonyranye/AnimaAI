@@ -12,7 +12,7 @@ from animal_dataset import AnimalDataset
 
 DATA_ROOT = "Animals"  
 BATCH_SIZE = 32
-NUM_EPOCHS = 5
+NUM_EPOCHS = 10
 LR = 1e-4
 VAL_SPLIT = 0.2
 
@@ -109,6 +109,10 @@ def train():
 
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=LR)
+    
+    # -- Used to Track the best Model -- 
+    best_val_acc = 0.0
+    best_epoch = -1
 
     for epoch in range(NUM_EPOCHS):
         # ----- Train -----
@@ -163,16 +167,22 @@ def train():
             f"Val loss: {val_loss:.4f}, acc: {val_acc:.3f}"
         )
 
-    # Save model + label mapping
-    torch.save(
-        {
-            "model_state_dict": model.state_dict(),
-            "label_to_idx": label_to_idx,
-            "class_names": class_names,
-        },
-        "animal_model_local.pth",
-    )
-    print("Saved model to animal_model_local.pth")
+     # ---- NEW: save model if this epoch is the best so far ----
+        if val_acc > best_val_acc:
+            best_val_acc = val_acc
+            best_epoch = epoch + 1
+            torch.save(
+                {
+                    "model_state_dict": model.state_dict(),
+                    "label_to_idx": label_to_idx,
+                    "class_names": class_names,
+                },
+                "snake_gecko_chameleon_local.pth",
+            )
+            print(f"  >> New best model saved (epoch {best_epoch}, val_acc={best_val_acc:.3f})")
+
+    print(f"Training complete. Best epoch: {best_epoch} with val_acc={best_val_acc:.3f}")
+    print("Best model is stored in animal_model_local.pth")
 
 
 if __name__ == "__main__":
