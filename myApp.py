@@ -1,25 +1,112 @@
+import os
 import torch
 from torchvision import models, transforms
 from PIL import Image
 import gradio as gr
 
-# --- Device ---
+# --- Base directories ---
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_DIR = os.path.join(BASE_DIR, "Models")
+
+print("BASE_DIR:", BASE_DIR)
+print("MODEL_DIR:", MODEL_DIR)
+print("Files in MODEL_DIR:", os.listdir(MODEL_DIR))
+
+# ----------------- Device -----------------
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
-# --- Load checkpoint saved by your training script ---
-checkpoint = torch.load("animal_model_local.pth", map_location=DEVICE)
-class_names = checkpoint["class_names"]           # e.g. ["cat", "dog", "spider"]
-label_to_idx = checkpoint["label_to_idx"]         # e.g. {"cat": 0, "dog": 1, "spider": 2}
 
-# --- Rebuild the same model architecture ---
-model = models.resnet18(weights=None)             # start empty
-num_features = model.fc.in_features
-model.fc = torch.nn.Linear(num_features, len(class_names))
-model.load_state_dict(checkpoint["model_state_dict"])
-model.to(DEVICE)
-model.eval()
+# ----------------- Loader helper -----------------
 
-# --- Same preprocessing as your val_transform ---
+def load_resnet18_from_checkpoint(ckpt_path: str):
+    """
+    Load a ResNet18 from one of your training checkpoints.
+    Expects keys: 'class_names', 'label_to_idx', 'model_state_dict'.
+    """
+    ckpt = torch.load(ckpt_path, map_location=DEVICE)
+
+    class_names = ckpt["class_names"]
+    label_to_idx = ckpt.get(
+        "label_to_idx",
+        {name: i for i, name in enumerate(class_names)}
+    )
+
+    model = models.resnet18(weights=None)
+    num_features = model.fc.in_features
+    model.fc = torch.nn.Linear(num_features, len(class_names))
+    model.load_state_dict(ckpt["model_state_dict"])
+    model.to(DEVICE)
+    model.eval()
+
+    return model, class_names, label_to_idx
+
+
+def safe_load(path):
+    """Load a checkpoint if it exists, otherwise return (None, None, None)."""
+    if os.path.exists(path):
+        return load_resnet18_from_checkpoint(path)
+    print(f"[WARN] Specialist checkpoint not found: {path}")
+    return None, None, None
+
+
+# ----------------- Load all models -----------------
+
+# router (coarse animal classifier)
+ROUTER_CKPT = os.path.join(MODEL_DIR, "animal_model_local.pth")
+router_model, router_classes, _ = load_resnet18_from_checkpoint(ROUTER_CKPT)
+
+# specialist models
+cats_dogs_model, cats_dogs_classes, _ = safe_load(
+    os.path.join(MODEL_DIR, "cats-dogs_model_local.pth")
+)
+cat_breed_model, cat_breed_classes, _ = safe_load(
+    os.path.join(MODEL_DIR, "cat-breed_model_local.pth")
+)
+dog_breed_model, dog_breed_classes, _ = safe_load(
+    os.path.join(MODEL_DIR, "dog-breed_model_local.pth")
+)
+birds_butter_model, birds_butter_classes, _ = safe_load(
+    os.path.join(MODEL_DIR, "birds-butterflies_model_local.pth")
+)
+feline_model, feline_classes, _ = safe_load(
+    os.path.join(MODEL_DIR, "feline_model_local.pth")
+)
+
+
+
+# ----------------- Pretty labels -----------------
+
+PRETTY_LABELS = {
+    # router-level classes (folder names)
+    "birds": "Bird",
+    "butterfly": "Butterfly",
+    "cats": "Cat",
+    "dogs": "Dog",
+    "Cheetahs": "Cheetah",
+    "Crocodile-Alligator": "Crocodile / Alligator",
+    "elephant": "Elephant",
+    "Frog": "Frog",
+    "Gecko": "Gecko",
+    "horse": "Horse",
+    "snake": "Snake",
+    "spider": "Spider",
+    "wolves": "Wolf",
+
+    # some possible breed labels (adjust to match your actual class_names)
+    "siamese": "Siamese Cat",
+    "maine_coon": "Maine Coon",
+    "golden_retriever": "Golden Retriever",
+    "german_shepherd": "German Shepherd",
+    "labrador": "Labrador Retriever",
+}
+
+
+def pretty_name(raw: str) -> str:
+    return PRETTY_LABELS.get(raw, raw.replace("_", " ").title())
+
+
+# ----------------- Preprocessing -----------------
+
 preprocess = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
@@ -29,33 +116,117 @@ preprocess = transforms.Compose([
     ),
 ])
 
-def predict(image: Image.Image):
-    """
-    image: PIL image from Gradio upload
-    returns: dict {class_name: probability} for Gradio to display nicely
-    """
-    img = preprocess(image).unsqueeze(0).to(DEVICE)   # [1, 3, 224, 224]
 
+# ----------------- Small helpers -----------------
+
+def run_model_to_dict(model, class_names, img_tensor):
+    """Run model and return {raw_label: prob}."""
     with torch.no_grad():
-        outputs = model(img)                          # logits
-        probs = torch.softmax(outputs, dim=1)[0]      # [num_classes]
+        logits = model(img_tensor)
+        probs = torch.softmax(logits, dim=1)[0]
 
-    # Map to {class_name: prob}
-    result = {class_names[i]: float(probs[i]) for i in range(len(class_names))}
-    return result
+    return {
+        class_names[i]: float(probs[i])
+        for i in range(len(class_names))
+    }
 
-# --- Gradio UI with an upload button ---
+
+def top_k_from_dict(scores, k=2):
+    """Return list of (label, prob) sorted desc."""
+    return sorted(scores.items(), key=lambda kv: kv[1], reverse=True)[:k]
+
+
+def pretty_scores(scores_dict):
+    """Map raw labels -> pretty display labels."""
+    return {pretty_name(lbl): prob for lbl, prob in scores_dict.items()}
+
+
+# ----------------- Main hierarchical predict() -----------------
+
+def predict(image: Image.Image):
+    x = preprocess(image).unsqueeze(0).to(DEVICE)
+
+    # 1) Router: coarse prediction across all 14 folders
+    router_scores = run_model_to_dict(router_model, router_classes, x)
+    router_top2 = top_k_from_dict(router_scores, k=2)
+    router_top1_label, router_top1_prob = router_top2[0]
+    router_top_labels = [lbl for lbl, _ in router_top2]
+
+    # ----- Special case: cat vs dog ambiguity -> cats-dogs specialist -----
+    if ("cats" in router_top_labels and "dogs" in router_top_labels
+            and cats_dogs_model is not None):
+        cd_scores = run_model_to_dict(cats_dogs_model, cats_dogs_classes, x)
+        cd_top1_label, cd_top1_prob = top_k_from_dict(cd_scores, k=1)[0]
+
+        # If that says "cats" -> cat breed model
+        if cd_top1_label == "cats" and cat_breed_model is not None:
+            cat_scores = run_model_to_dict(cat_breed_model, cat_breed_classes, x)
+            return pretty_scores(cat_scores)
+
+        # If that says "dogs" -> dog breed model
+        if cd_top1_label == "dogs" and dog_breed_model is not None:
+            dog_scores = run_model_to_dict(dog_breed_model, dog_breed_classes, x)
+            return pretty_scores(dog_scores)
+
+        # otherwise just show cats-dogs output
+        return pretty_scores(cd_scores)
+
+    # ----- Birds vs Butterfly ambiguity -> birds-butterflies specialist -----
+    if ("birds" in router_top_labels and "butterfly" in router_top_labels
+            and birds_butter_model is not None):
+        bb_scores = run_model_to_dict(birds_butter_model, birds_butter_classes, x)
+        return pretty_scores(bb_scores)
+
+    # ----- Otherwise, route by router top-1 label --------------------------
+    label = router_top1_label
+
+    # cats -> cat breeds if available
+    if label == "cats":
+        if cat_breed_model is not None:
+            cat_scores = run_model_to_dict(cat_breed_model, cat_breed_classes, x)
+            return pretty_scores(cat_scores)
+        # fallback to cats-dogs if cat-breed missing
+        if cats_dogs_model is not None:
+            cd_scores = run_model_to_dict(cats_dogs_model, cats_dogs_classes, x)
+            return pretty_scores(cd_scores)
+
+    # dogs -> dog breeds if available
+    if label == "dogs":
+        if dog_breed_model is not None:
+            dog_scores = run_model_to_dict(dog_breed_model, dog_breed_classes, x)
+            return pretty_scores(dog_scores)
+        if cats_dogs_model is not None:
+            cd_scores = run_model_to_dict(cats_dogs_model, cats_dogs_classes, x)
+            return pretty_scores(cd_scores)
+
+    # birds / butterfly -> specialist
+    if label in {"birds", "butterfly"} and birds_butter_model is not None:
+        bb_scores = run_model_to_dict(birds_butter_model, birds_butter_classes, x)
+        return pretty_scores(bb_scores)
+
+    # cheetahs / other big-feline style labels -> feline specialist
+    if label in {"Cheetahs","cats"} and feline_model is not None:
+        fe_scores = run_model_to_dict(feline_model, feline_classes, x)
+        return pretty_scores(fe_scores)
+
+    # For all other animals (elephant, snake, spider, horse, etc.)
+    # we only have the router, so just show its probabilities.
+    return pretty_scores(router_scores)
+
+
+# ----------------- Gradio UI -----------------
+
 demo = gr.Interface(
     fn=predict,
     inputs=gr.Image(type="pil", label="Upload an animal image"),
-    outputs=gr.Label(num_top_classes=3, label="Predicted class"),
-    title="AnimAI – Animal Classifier",
-    description="Upload a cat/dog/spider image and see what the model predicts.",
+    outputs=gr.Label(num_top_classes=3, label="Predicted animal / breed"),
+    title="AnimAI – Hierarchical Animal Classifier",
+    description=(
+        "Step 1: a router model guesses the general animal type.\n"
+        "Step 2: for cats/dogs/birds/butterflies/cheetahs, "
+        "specialist models refine the prediction."
+    ),
 )
 
-print(torch.cuda.is_available())
-print(DEVICE)
-
 if __name__ == "__main__":
-    demo.launch(share = True)
-    
+    demo.launch()
