@@ -7,7 +7,7 @@ import gradio as gr
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 # --- Load checkpoint saved by your training script ---
-checkpoint = torch.load("animal_model_local.pth", map_location=DEVICE)
+checkpoint = torch.load("bird_chameleon_model_local.pth", map_location=DEVICE)
 class_names = checkpoint["class_names"]           # list of raw class labels (folder names)
 label_to_idx = checkpoint["label_to_idx"]
 
@@ -21,11 +21,7 @@ model.eval()
 
 # --- Pretty display names for classes (you can expand this anytime) ---
 PRETTY_LABELS = {
-
-    # cat breeds
     "bird" : "Birds",
-    "butterfly" : "Butterflies"
-
 }
 
 def pretty_name(raw_label: str) -> str:

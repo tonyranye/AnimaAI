@@ -173,9 +173,9 @@ def train():
             "label_to_idx": label_to_idx,
             "class_names": class_names,
         },
-        "animal_model_local.pth",
+        "bird_chameleon_model_local.pth",
     )
-    print("Saved model to animal_model_local.pth")
+    print("Saved model to bird_chameleon_model_local.pth")
 
 
 if __name__ == "__main__":
