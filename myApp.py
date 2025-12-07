@@ -22,23 +22,9 @@ model.eval()
 # --- Pretty display names for classes (you can expand this anytime) ---
 PRETTY_LABELS = {
 
-    # cat breeds
-    "Abyssinian": "Abyssinian cat",
-    "Bengal": "Bengal cat",
-    "Birman": "Birman cat",
-    "Bombay": "Bombay cat",
-    "Dilute Calico": "Dilute Calico",
-    "domestic_shorthair": "Domestic Shorthair cat",
-    "Egyptian_Mau": "Eqyptian Mau",
-    "Himalayan": "Himalayan",
-    "maine_coon": "Maine Coon",
-    "Persian": "Persian",
-    "Russian Blue": "Russian Blue Cat",
-    "Siamese": "Siamese Cat",
-    "Sphynx": "Sphynx Cat",
-    "Tabby Cat": "Tabby Cat",
-    "Tuxedo": "Tuxedo Cat",
-
+    # cat and dog
+    "cats": "Cats",
+    "dogs": "Dogs",
 }
 
 def pretty_name(raw_label: str) -> str:
