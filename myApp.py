@@ -71,6 +71,10 @@ birds_butter_model, birds_butter_classes, _ = safe_load(
 feline_model, feline_classes, _ = safe_load(
     os.path.join(MODEL_DIR, "feline_model_local.pth")
 )
+snake_gecko_chameleon_model, snake_gecko_chameleon_classes, _ = safe_load(
+    os.path.join(MODEL_DIR, "snake_gecko_chameleon_local.pth")
+)
+
 
 
 
@@ -91,13 +95,6 @@ PRETTY_LABELS = {
     "snake": "Snake",
     "spider": "Spider",
     "wolves": "Wolf",
-
-    # some possible breed labels (adjust to match your actual class_names)
-    "siamese": "Siamese Cat",
-    "maine_coon": "Maine Coon",
-    "golden_retriever": "Golden Retriever",
-    "german_shepherd": "German Shepherd",
-    "labrador": "Labrador Retriever",
 }
 
 
@@ -208,6 +205,11 @@ def predict(image: Image.Image):
     if label in {"Cheetahs","cats"} and feline_model is not None:
         fe_scores = run_model_to_dict(feline_model, feline_classes, x)
         return pretty_scores(fe_scores)
+
+    #  snake / gecko / chameleon -> specialist
+    if label in {"snake","gecko","chameleon"} and feline_model is not None:
+        sgc_scores = run_model_to_dict(snake_gecko_chameleon_model, snake_gecko_chameleon_classes, x)
+        return pretty_scores(sgc_scores)
 
     # For all other animals (elephant, snake, spider, horse, etc.)
     # we only have the router, so just show its probabilities.
