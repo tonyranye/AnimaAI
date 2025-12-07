@@ -54,7 +54,7 @@ GUI packages
 Install them using the command below:
 
 ```
-pip install torch torchvision pillow matplotlib
+pip install torch torchvision pillow matplotlib gradio
 ```
 
 ## 3️⃣ Running the Code
