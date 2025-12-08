@@ -177,12 +177,12 @@ def train():
                     "label_to_idx": label_to_idx,
                     "class_names": class_names,
                 },
-                "snake_gecko_chameleon_local.pth",
+                "snake_chameleon_local.pth",
             )
             print(f"  >> New best model saved (epoch {best_epoch}, val_acc={best_val_acc:.3f})")
 
     print(f"Training complete. Best epoch: {best_epoch} with val_acc={best_val_acc:.3f}")
-    print("Best model is stored in animal_model_local.pth")
+    print("Best model is stored in snake_chameleon_local.pth")
 
 
 if __name__ == "__main__":
