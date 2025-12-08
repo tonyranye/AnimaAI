@@ -77,8 +77,8 @@ birds_butter_model, birds_butter_classes, _ = safe_load(
 feline_model, feline_classes, _ = safe_load(
     os.path.join(MODEL_DIR, "feline_model_local.pth")
 )
-snake_gecko_chameleon_model, snake_gecko_chameleon_classes, _ = safe_load(
-    os.path.join(MODEL_DIR, "snake_gecko_chameleon_local.pth")
+snake_chameleon_model, snake_chameleon_classes, _ = safe_load(
+    os.path.join(MODEL_DIR, "snake_chameleon_local.pth")
 )
 birds_chemeleon_model, birds_chemeleon_classes, _ = safe_load(
     os.path.join(MODEL_DIR, "bird_chameleon_model_local.pth")
@@ -99,7 +99,6 @@ PRETTY_LABELS = {
     "Crocodile-Alligator": "Crocodile / Alligator",
     "elephant": "Elephant",
     "Frog": "Frog",
-    "Gecko": "Gecko",
     "horse": "Horse",
     "snake": "Snake",
     "spider": "Spider",
@@ -231,10 +230,10 @@ def predict(image: Image.Image):
         fe_scores = run_model_to_dict(feline_model, feline_classes, x)
         return pretty_scores(fe_scores)
 
-    #  snake / gecko / chameleon -> specialist
-    if label in {"snake","Gecko","Chameleon"} and feline_model is not None:
-        sgc_scores = run_model_to_dict(snake_gecko_chameleon_model, snake_gecko_chameleon_classes, x)
-        return pretty_scores(sgc_scores)
+    #  snake / chameleon -> specialist
+    if label in {"snake","Chameleon"} and snake_chameleon_model is not None:
+        sc_scores = run_model_to_dict(snake_chameleon_model, snake_chameleon_classes, x)
+        return pretty_scores(sc_scores)
     
     # birds / chameleon -> specialist
     if label in {"birds", "Chameleon"} and birds_chemeleon_model is not None:
