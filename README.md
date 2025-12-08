@@ -19,13 +19,40 @@ This makes it suitable for wildlife research tools, educational apps, and automa
 
 ---
 
-## 2️⃣ Problem Statement
+---
+
+## 2️⃣ Installation
+
+Install required packages:
+
+```bash
+pip install torch torchvision pillow matplotlib gradio streamlit
+```
+
+---
+
+## 3️⃣ Running the Classifier App
+
+Start the Gradio interface:
+
+```bash
+python myApp.py
+```
+
+This will:
+
+- Load the router model  
+- Load all available specialist models  
+- Launch an interactive web app  
+- Allow users to upload images for real-time predictions  
+
+## 4️⃣ Problem Statement
 
 Image classification is one of the most fundamental tasks in machine learning. Animals are one of the most common real world targets: from wildlife monitoring and ecological research to educational apps and pet-ID tools. However animals are visually diverse and often have many breeds with similar appearances. A single monolithic neural network that tries to classify everything at once can struggle to distinguish each animal due to things like: large label space, imbalance datasets between species, fine-grained distinctions between visually similar classes, etc. Our project, AnimalAI, tackles this by combining a general router CNN with a set of specialized CNNs. Users upload an image and the system: uses a router model to predict a coarse animal category (e.g. Cat, dog, bird, butterfly, etc.) then, it routes the images to specialist models(e.g. Dog breeds, cat breeds, birds vs butterflies, etc.) finally, the network returns a final prediction with probabilities via Streamlit. 
 
 ---
 
-## 3️⃣ Training the Models
+## 5️⃣ Training the Models
 
 Training is performed through `train_animals.py` and additional scripts for specialist models.
 
@@ -89,33 +116,6 @@ Models are stored in the `Models/` directory.
 
 ---
 
-## 4️⃣ Installation
-
-Install required packages:
-
-```bash
-pip install torch torchvision pillow matplotlib gradio streamlit
-```
-
----
-
-## 5️⃣ Running the Classifier App
-
-Start the Gradio interface:
-
-```bash
-python myApp.py
-```
-
-This will:
-
-- Load the router model  
-- Load all available specialist models  
-- Launch an interactive web app  
-- Allow users to upload images for real-time predictions  
-
----
-
 ## 6️⃣ Deployment & Real-World Integration
 
 This project demonstrates how a trained neural network can be integrated into an actual software application.  
@@ -137,7 +137,7 @@ Developed for:
 Ontario Tech University  
 
 Team Members:  
-Christopher Kiige
-Tony Akinniranye
-Lucas Fenkam
-Jedidiah Dennis
+-  Christopher Kiige
+-  Tony Akinniranye
+-  Lucas Fenkam
+-  Jedidiah Dennis
