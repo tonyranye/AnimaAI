@@ -226,7 +226,7 @@ def predict(image: Image.Image):
         return pretty_scores(bb_scores)
 
     # cheetahs / other big-feline style labels -> feline specialist
-    if label in {"Cheetahs","cats"} and feline_model is not None:
+    if label in {"Cheetahs","Lions","cats"} and feline_model is not None:
         fe_scores = run_model_to_dict(feline_model, feline_classes, x)
         return pretty_scores(fe_scores)
 
@@ -271,6 +271,7 @@ demo = gr.Interface(
         "🐦 Birds<br>"
         "🦋 Butterflies<br>"
         "🐯 Cheetahs<br>"
+        "🦁 Loins<br>"
         "🐺 Wolves<br>"
         "🐴 Horses<br>"
         "🐘 Elephants<br>"
