@@ -252,7 +252,7 @@ demo = gr.Interface(
     fn=predict,
     inputs=gr.Image(type="pil", label="Upload an animal image", elem_id="center_image"),
     outputs=gr.Label(num_top_classes=3, label="Predicted animal / breed"),
-    title="<h1 style='text-align:center;'>AnimaAI – Hierarchical Animal Classifier</h1>",
+    title="AnimaAI – Hierarchical Animal Classifier</h1>",
     description=(
         "<p style='font-size:20px; text-align:center;'>Upload an animal image for AI classification.</p>"
         "<p style='font-size:16px; text-align:center;'>For best results, capture a full-body image.</p>"
