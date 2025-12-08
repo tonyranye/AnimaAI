@@ -19,8 +19,6 @@ This makes it suitable for wildlife research tools, educational apps, and automa
 
 ---
 
----
-
 ## 2️⃣ Installation
 
 Install required packages:
