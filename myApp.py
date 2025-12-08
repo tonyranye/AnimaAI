@@ -251,11 +251,38 @@ def predict(image: Image.Image):
 demo = gr.Interface(
     fn=predict,
     inputs=gr.Image(type="pil", label="Upload an animal image", elem_id="center_image"),
-    outputs=gr.Label(num_top_classes=3, label="Predicted animal / breed"),
-    title="AnimaAI – Hierarchical Animal Classifier</h1>",
+    outputs=gr.Label(num_top_classes=3, label="Predicted animal / breed", elem_id="center_output"),
+    title="AnimAI – Hierarchical Animal Classifier",
     description=(
-        "<p style='font-size:20px; text-align:center;'>Upload an animal image for AI classification.</p>"
-        "<p style='font-size:16px; text-align:center;'>For best results, capture a full-body image.</p>"
+    "<div style='text-align:center;'>"
+        "<p style='font-size:20px;'>Upload an animal image for AI classification.</p>"
+        "<p style='font-size:16px;'>For best results, capture a full-body image of the animal.</p>"
+        "<br>"
+
+        "<details style='display:inline-block; text-align:left; font-size:16px; margin-top:10px;'>"
+        "<summary style='cursor:pointer; font-size:16px; padding:6px 12px; "
+        "border:1px solid white; border-radius:6px; display:inline-block;'>"
+        "<b>Supported animals (click to expand)</b>"
+        "</summary>"
+
+        "<div style='margin-top:12px; line-height:1.6; font-size:16px;'>"
+        "🐶 Dogs <br>"
+        "🐱 Cats <br>"
+        "🐦 Birds<br>"
+        "🦋 Butterflies<br>"
+        "🐯 Cheetahs<br>"
+        "🐺 Wolves<br>"
+        "🐴 Horses<br>"
+        "🐘 Elephants<br>"
+        "🐸 Frogs<br>"
+        "🦎 Chameleons<br>"
+        "🐍 Snakes<br>"
+        "🕷️ Spiders<br>"
+        "🐊 Crocodiles / Alligators<br>"
+        "</div>"
+
+        "</details>"
+        "</div>"
     ),
     css="""
         #center_image {
@@ -263,9 +290,13 @@ demo = gr.Interface(
             margin-right: auto !important;
             display: block !important;
         }
+        #center_output {
+            margin-left: auto !important;
+            margin-right: auto !important;
+            text-align: center !important;
+        }
     """
 )
 
 if __name__ == "__main__":
     demo.launch()
-
