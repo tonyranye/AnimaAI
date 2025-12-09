@@ -56,6 +56,7 @@ Image classification is one of the most fundamental tasks in machine learning. A
 ### General Animals
 - **Cats, Dogs, Elephants, Horses, Lions**  
   https://www.kaggle.com/datasets/antobenedetti/animals
+
   https://www.kaggle.com/datasets/yapwh1208/cats-breed-dataset?resource=download
 
 ### Dog Breeds
