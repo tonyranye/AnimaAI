@@ -24,7 +24,7 @@ This makes it suitable for wildlife research tools, educational apps, and automa
 Install required packages:
 
 ```bash
-pip install torch torchvision pillow matplotlib gradio streamlit
+pip install torch torchvision pillow matplotlib gradio
 ```
 
 ---
