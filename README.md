@@ -51,14 +51,12 @@ Image classification is one of the most fundamental tasks in machine learning. A
 ---
 ## 5️⃣ Datasets
 
-Here are the datasets used:
   ## Datasets Used
   
 ### General Animals
 - **Cats, Dogs, Elephants, Horses, Lions**  
   https://www.kaggle.com/datasets/antobenedetti/animals
-  
-  [https://www.kaggle.com/datasets/yapwh1208/cats-breed-dataset?resource=download]([url])
+  https://www.kaggle.com/datasets/yapwh1208/cats-breed-dataset?resource=download
 
 ### Dog Breeds
 - **70 Dog Breeds Image Dataset**  
