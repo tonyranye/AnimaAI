@@ -52,7 +52,7 @@ Image classification is one of the most fundamental tasks in machine learning. A
 ## 5️⃣ Datasets
 
 Here are the datasets used:
-- [https://www.kaggle.com/datasets/yapwh1208/cats-breed-dataset?resource=download](url)
+- [https://www.kaggle.com/datasets/yapwh1208/cats-breed-dataset?resource=download]([url](https://www.kaggle.com/datasets/yapwh1208/cats-breed-dataset?resource=download))
 
 ---
 ## 6️⃣ Training the Models
