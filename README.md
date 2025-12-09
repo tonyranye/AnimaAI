@@ -78,7 +78,7 @@ Specialist datasets exist for:
 - Butterflies  
 - Birds  
 - Big cats  
-- Snake / gecko / chameleon  
+- Snake / Chameleon  
 - Birds vs butterflies (ambiguity resolution)
 
 ### Training Details
