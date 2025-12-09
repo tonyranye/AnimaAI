@@ -52,7 +52,42 @@ Image classification is one of the most fundamental tasks in machine learning. A
 ## 5️⃣ Datasets
 
 Here are the datasets used:
-- [https://www.kaggle.com/datasets/yapwh1208/cats-breed-dataset?resource=download]([url])
+  ## Datasets Used
+  
+### General Animals
+- **Cats, Dogs, Elephants, Horses, Lions**  
+  https://www.kaggle.com/datasets/antobenedetti/animals
+  
+  [https://www.kaggle.com/datasets/yapwh1208/cats-breed-dataset?resource=download]([url])
+
+### Dog Breeds
+- **70 Dog Breeds Image Dataset**  
+  https://www.kaggle.com/datasets/gpiosenka/70-dog-breedsimage-data-set
+
+### Butterfly Species
+- **Butterfly Image Classification Dataset**  
+  https://www.kaggle.com/datasets/phucthaiv02/butterfly-image-classification  
+  Training data extracted from `Training_set.csv`
+
+### Bird Species
+- **Bird Species Dataset**  
+  https://www.kaggle.com/datasets/linh123456/birds-dataset
+
+- **Additional Bird Dataset**  
+  https://www.kaggle.com/datasets/samuelayman/bird-dataset
+
+### Wolves
+- **Dogs vs Wolves Dataset**  
+  https://www.kaggle.com/datasets/harishvutukuri/dogs-vs-wolves
+
+### Reptiles and Amphibians
+- **Chameleon, Crocodile, Alligator, Frog, Snake**  
+  https://www.kaggle.com/datasets/vencerlanz09/reptiles-and-amphibians-image-dataset
+
+### Big Cats
+- **Lions and Cheetahs Image Classification Dataset**  
+  https://www.kaggle.com/datasets/mikoajfish99/lions-or-cheetahs-image-classification
+
 
 ---
 ## 6️⃣ Training the Models
